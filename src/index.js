@@ -33,7 +33,7 @@ function onFormSubmit(event) {
 async function fetchAndRenderPage() {
   if (!galleryApiService.query) {
     galleryApiService.emptyFieldSearch();
-    searchForm.reset();
+    // searchForm.reset();
     return;
   }
   clearGallery();
@@ -41,7 +41,7 @@ async function fetchAndRenderPage() {
 
   try {
     const response = await galleryApiService.getImages();
-    if (response.hits === 0) {
+    if (response.hits.length === 0) {
       galleryApiService.emptyArray();
       return;
     }
@@ -55,11 +55,14 @@ async function fetchAndRenderPage() {
 
 async function onLoadMore() {
   try {
+    const { page, per_page } = galleryApiService;
     const response = await galleryApiService.getImages();
     createGalleryMarkup(response.hits);
     lightbox.refresh();
-    if (response.hits.page * response.hits.per_page > response.totalHits) {
+    if (page * per_page > response.totalHits) {
+      loadMoreBtn.classList.add('is-hidden');
       galleryApiService.endOfCollection();
+
       return;
     }
   } catch (error) {

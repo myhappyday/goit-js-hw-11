@@ -9,7 +9,7 @@ export default class GalleryApiService {
     this.page = 1;
     this.per_page = 40;
   }
-  getImages() {
+  async getImages() {
     const searchParams = new URLSearchParams({
       key: API_KEY,
       q: this.searchQuery,
@@ -20,13 +20,16 @@ export default class GalleryApiService {
       per_page: this.per_page,
     });
 
-    return fetch(`${BASE_URL}?${searchParams.toString()}`).then(response => {
+    try {
+      const response = await fetch(`${BASE_URL}?${searchParams.toString()}`);
       if (!response.ok) {
         throw new Error(response.status);
       }
       this.incrementPage();
-      return response.json();
-    });
+      return await response.json();
+    } catch (error) {
+      consol.error(error);
+    }
   }
 
   get query() {
